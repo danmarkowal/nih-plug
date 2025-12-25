@@ -9,6 +9,7 @@ use baseview::{Size, WindowHandle, WindowOpenOptions, WindowScalePolicy};
 use crossbeam::atomic::AtomicCell;
 use egui_baseview::egui::Context;
 use egui_baseview::EguiWindow;
+use nih_plug::nih_dbg;
 use nih_plug::prelude::{Editor, GuiContext, ParamSetter, ParentWindowHandle};
 use parking_lot::RwLock;
 use raw_window_handle::{HasRawWindowHandle, RawWindowHandle};
@@ -112,7 +113,10 @@ where
                     // Ask the plugin host to resize to self.size()
                     if context.request_resize() {
                         // Resize the content of egui window
-                        queue.resize(PhySize::new(new_size.0, new_size.1));
+                        let ppp = egui_ctx.pixels_per_point().round() as u32;
+                        queue.resize(PhySize::new(new_size.0 * ppp, new_size.1 * ppp));
+                        
+                        // Resize the viewport
                         egui_ctx.send_viewport_cmd(ViewportCommand::InnerSize(Vec2::new(
                             new_size.0 as f32,
                             new_size.1 as f32,
