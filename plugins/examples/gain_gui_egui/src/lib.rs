@@ -1,9 +1,6 @@
 use nih_plug::prelude::*;
 use nih_plug_egui::{
-    create_egui_editor,
-    egui::{self, Vec2},
-    resizable_window::ResizableWindow,
-    widgets, EguiState,
+    EguiState, create_egui_editor, egui::{self, Vec2}, resizable_window::ResizableWindow, widgets
 };
 use std::sync::Arc;
 

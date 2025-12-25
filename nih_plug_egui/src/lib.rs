@@ -75,6 +75,10 @@ pub struct EguiState {
     /// Whether the editor's window is currently open.
     #[serde(skip)]
     open: AtomicBool,
+
+    /// Whether we are currently resizing the window or not.
+    #[serde(skip)]
+    resizing: AtomicBool,
 }
 
 impl<'a> PersistentField<'a, EguiState> for Arc<EguiState> {
@@ -98,6 +102,7 @@ impl EguiState {
             size: AtomicCell::new((width, height)),
             requested_size: Default::default(),
             open: AtomicBool::new(false),
+            resizing: AtomicBool::new(false),
         })
     }
 

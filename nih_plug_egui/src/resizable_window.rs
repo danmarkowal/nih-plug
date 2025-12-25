@@ -1,5 +1,7 @@
 //! Resizable window wrapper for Egui editor.
 
+use std::sync::atomic::Ordering;
+
 use egui_baseview::egui::emath::GuiRounding;
 use egui_baseview::egui::{InnerResponse, UiBuilder};
 
@@ -29,7 +31,7 @@ impl ResizableWindow {
     }
 
     pub fn show<R>(
-        self,
+        &mut self,
         context: &Context,
         egui_state: &EguiState,
         add_contents: impl FnOnce(&mut Ui) -> R,
@@ -46,11 +48,18 @@ impl ResizableWindow {
 
             let corner_response = ui.interact(corner_rect, self.id.with("corner"), Sense::drag());
 
-            if let Some(pointer_pos) = corner_response.interact_pointer_pos() {
-                let desired_size = (pointer_pos - ui_rect.min + 0.5 * corner_response.rect.size())
-                    .max(self.min_size);
+            if corner_response.drag_started() {
+                egui_state.resizing.store(true, Ordering::Release); 
+            } else if corner_response.drag_stopped() {
+                egui_state.resizing.store(false, Ordering::Release);
+            }
 
-                if corner_response.dragged() {
+            if egui_state.resizing.load(Ordering::Acquire) {
+                if let Some(pointer_pos) = context.pointer_latest_pos() {
+
+                    let desired_size = (pointer_pos - ui_rect.min + 0.5 * corner_response.rect.size())
+                        .max(self.min_size);
+
                     egui_state.set_requested_size((
                         desired_size.x.round() as u32,
                         desired_size.y.round() as u32,
