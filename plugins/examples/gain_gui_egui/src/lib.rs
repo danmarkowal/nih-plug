@@ -109,6 +109,7 @@ impl Plugin for Gain {
             self.params.editor_state.clone(),
             (),
             |_, _| {},
+            |_| {},
             move |egui_ctx, setter, _state| {
                 ResizableWindow::new("res-wind")
                     .min_size(Vec2::new(128.0, 128.0))

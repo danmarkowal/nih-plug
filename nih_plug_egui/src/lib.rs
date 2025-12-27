@@ -7,6 +7,7 @@
 
 use crossbeam::atomic::AtomicCell;
 use egui::Context;
+use nih_plug::editor::ParentWindowHandle;
 use nih_plug::params::persist::PersistentField;
 use nih_plug::prelude::{Editor, ParamSetter};
 use parking_lot::RwLock;
@@ -34,21 +35,24 @@ pub mod widgets;
 /// field on your parameters struct.
 ///
 /// See [`EguiState::from_size()`].
-pub fn create_egui_editor<T, B, U>(
+pub fn create_egui_editor<T, B, P, U>(
     egui_state: Arc<EguiState>,
     user_state: T,
     build: B,
+    parent_window_handle_set: P,
     update: U,
 ) -> Option<Box<dyn Editor>>
 where
     T: 'static + Send + Sync,
     B: Fn(&Context, &mut T) + 'static + Send + Sync,
+    P: Fn(ParentWindowHandle) + 'static + Send + Sync,
     U: Fn(&Context, &ParamSetter, &mut T) + 'static + Send + Sync,
 {
     Some(Box::new(editor::EguiEditor {
         egui_state,
         user_state: Arc::new(RwLock::new(user_state)),
         build: Arc::new(build),
+        parent_window_handle_set: Arc::new(parent_window_handle_set),
         update: Arc::new(update),
 
         // TODO: We can't get the size of the window when baseview does its own scaling, so if the
@@ -58,10 +62,6 @@ where
         scaling_factor: AtomicCell::new(None),
         #[cfg(not(target_os = "macos"))]
         scaling_factor: AtomicCell::new(Some(1.0)),
-
-        // Set this to None initially
-        // This gets overriden when the editor is spawned
-        parent: AtomicCell::new(None)
     }))
 }
 
