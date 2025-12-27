@@ -29,6 +29,10 @@ pub(crate) struct EguiEditor<T> {
     /// The scaling factor reported by the host, if any. On macOS this will never be set and we
     /// should use the system scaling factor instead.
     pub(crate) scaling_factor: AtomicCell<Option<f32>>,
+
+    /// Needed to set drag data
+    /// We won't be sharing this between threads as it may be unsafe to do so
+    pub(crate) handle: AtomicCell<Option<EguiEditorHandle>>,
 }
 
 /// This version of `baseview` uses a different version of `raw_window_handle than NIH-plug, so we
@@ -136,10 +140,14 @@ where
         );
 
         self.egui_state.open.store(true, Ordering::Release);
-        Box::new(EguiEditorHandle {
+
+        let handle = EguiEditorHandle {
             egui_state: self.egui_state.clone(),
             window,
-        })
+        };
+
+        self.handle.store(handle); 
+        Box::new(handle)
     }
 
     /// Size of the editor window
