@@ -179,7 +179,7 @@ where
 }
 
 /// The window handle used for [`EguiEditor`].
-struct EguiEditorHandle {
+pub struct EguiEditorHandle {
     egui_state: Arc<EguiState>,
     window: WindowHandle,
 }
