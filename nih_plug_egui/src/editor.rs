@@ -146,7 +146,7 @@ where
             window,
         };
 
-        self.handle.store(handle); 
+        self.handle.store(Some(handle)); 
         Box::new(handle)
     }
 
