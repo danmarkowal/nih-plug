@@ -90,6 +90,9 @@ pub enum ParentWindowHandle {
     Win32Hwnd(*mut c_void),
 }
 
+/// There's nothing we can do...
+unsafe impl Send for ParentWindowHandle {}
+
 unsafe impl HasRawWindowHandle for ParentWindowHandle {
     fn raw_window_handle(&self) -> RawWindowHandle {
         match *self {

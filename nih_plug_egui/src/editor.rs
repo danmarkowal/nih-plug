@@ -32,7 +32,7 @@ pub(crate) struct EguiEditor<T> {
 
     /// Needed to set drag data
     /// We won't be sharing this between threads as it may be unsafe to do so
-    pub(crate) handle: AtomicCell<Option<EguiEditorHandle>>,
+    pub(crate) parent: AtomicCell<Option<ParentWindowHandle>>,
 }
 
 /// This version of `baseview` uses a different version of `raw_window_handle than NIH-plug, so we
@@ -140,14 +140,12 @@ where
         );
 
         self.egui_state.open.store(true, Ordering::Release);
+        self.parent.store(Some(parent)); 
 
-        let handle = EguiEditorHandle {
+        Box::new(EguiEditorHandle {
             egui_state: self.egui_state.clone(),
             window,
-        };
-
-        self.handle.store(Some(handle)); 
-        Box::new(handle)
+        })
     }
 
     /// Size of the editor window
@@ -187,7 +185,7 @@ where
 }
 
 /// The window handle used for [`EguiEditor`].
-pub struct EguiEditorHandle {
+struct EguiEditorHandle {
     egui_state: Arc<EguiState>,
     window: WindowHandle,
 }

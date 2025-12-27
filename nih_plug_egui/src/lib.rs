@@ -61,7 +61,7 @@ where
 
         // Set this to None initially
         // This gets overriden when the editor is spawned
-        handle: AtomicCell::new(None)
+        parent: AtomicCell::new(None)
     }))
 }
 
