@@ -110,7 +110,7 @@ where
                 let setter = ParamSetter::new(context.as_ref());
 
                 // If the window was requested to resize
-                if let Some(new_size) = egui_state.requested_size.swap(None) {
+                if let Some(new_size) = egui_state.requested_size.load() {
                     // Ask the plugin host to resize to self.size()
                     if context.request_resize() {
                         // Resize the content of egui window
@@ -125,6 +125,7 @@ where
 
                         // Update the state
                         egui_state.size.store(new_size);
+                        egui_state.requested_size.store(None);
                     }
                 }
 
